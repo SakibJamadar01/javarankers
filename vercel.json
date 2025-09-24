@@ -1,7 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist/spa",
-  "nodeVersion": "18.x",
   "functions": {
     "api/index.js": {
       "runtime": "@vercel/node@3.0.0"
