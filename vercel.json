@@ -1,11 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist/spa",
-  "functions": {
-    "api/index.js": {
-      "runtime": "@vercel/node@2.15.10"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
