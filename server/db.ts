@@ -1,33 +1,34 @@
-import mysql from "mysql2/promise";
+import { Pool } from 'pg';
 
 const {
-  DB_HOST = "127.0.0.1",
-  DB_PORT = "3306",
-  DB_USER = "root",
-  DB_PASSWORD = process.env.DB_PASSWORD || "sakib@777",
-  DB_NAME = "javarank_app",
+  DB_HOST = "aws-1-ap-southeast-1.pooler.supabase.com",
+  DB_PORT = "6543",
+  DB_USER = "postgres.npepikzrelfxymfwmhgu",
+  DB_PASSWORD,
+  DB_NAME = "postgres",
 } = process.env;
 
-export const pool = mysql.createPool({
+export const pool = new Pool({
   host: DB_HOST,
   port: Number(DB_PORT),
   user: DB_USER,
   password: DB_PASSWORD,
   database: DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
+  ssl: { rejectUnauthorized: false },
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
 export async function pingDb() {
-  let conn;
+  let client;
   try {
-    conn = await pool.getConnection();
-    await conn.ping();
+    client = await pool.connect();
+    await client.query('SELECT 1');
   } catch (error) {
     console.error('Database connection failed:', error);
     throw error;
   } finally {
-    if (conn) conn.release();
+    if (client) client.release();
   }
 }

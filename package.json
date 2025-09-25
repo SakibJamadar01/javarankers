@@ -30,6 +30,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/dompurify": "^3.0.5",
     "@types/nodemailer": "^7.0.1",
+    "@types/pg": "^8.15.5",
     "@uiw/codemirror-theme-dracula": "^4.25.1",
     "@uiw/codemirror-theme-github": "^4.25.1",
     "@uiw/codemirror-theme-sublime": "^4.25.1",
@@ -40,8 +41,8 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "monaco-editor": "^0.52.2",
-    "mysql2": "^3.14.4",
     "nodemailer": "^7.0.6",
+    "pg": "^8.16.3",
     "react-typed": "^2.0.12",
     "zod": "^3.25.76"
   },
@@ -92,7 +93,6 @@
     "cmdk": "^1.1.1",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
-
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.23.12",
     "globals": "^16.3.0",

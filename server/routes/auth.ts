@@ -54,26 +54,27 @@ export async function register(req: Request, res: Response) {
   const sanitizedEmail = email ? sanitizeInput(email) : null;
   let conn: any;
   try {
-    conn = await pool.getConnection();
-    await conn.beginTransaction();
-    const [rows] = await conn.query(
-      "SELECT id FROM users WHERE username = ? OR (email IS NOT NULL AND email = ?)",
+    conn = await pool.connect();
+    await conn.query('BEGIN');
+    const result = await conn.query(
+      "SELECT id FROM users WHERE username = $1 OR (email IS NOT NULL AND email = $2)",
       [username, email ?? null]
     );
-    if (Array.isArray(rows) && rows.length > 0) {
-      await conn.rollback();
+    const rows = result.rows;
+    if (rows.length > 0) {
+      await conn.query('ROLLBACK');
       return res.status(409).json({ error: "Username or email already exists" });
     }
 
     const password_hash = await hashPassword(password);
     await conn.query(
-      "INSERT INTO users (username, email, password_hash, password_algo) VALUES (?, ?, ?, 'BCRYPT')",
+      "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3)",
       [sanitizedUsername, sanitizedEmail, password_hash]
     );
-    await conn.commit();
+    await conn.query('COMMIT');
     return res.json({ ok: true, user: { username: sanitizedUsername } });
   } catch (e) {
-    try { if (conn) await conn.rollback(); } catch {}
+    try { if (conn) await conn.query('ROLLBACK'); } catch {}
     // If DB is unreachable in this environment, surface a clear message
     return res.status(503).json({ error: "Database unavailable" });
   } finally {
