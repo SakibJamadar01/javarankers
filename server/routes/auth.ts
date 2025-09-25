@@ -74,9 +74,10 @@ export async function register(req: Request, res: Response) {
     await conn.query('COMMIT');
     return res.json({ ok: true, user: { username: sanitizedUsername } });
   } catch (e) {
+    console.error('Registration error:', e);
     try { if (conn) await conn.query('ROLLBACK'); } catch {}
     // If DB is unreachable in this environment, surface a clear message
-    return res.status(503).json({ error: "Database unavailable" });
+    return res.status(503).json({ error: "Database unavailable", details: e.message });
   } finally {
     try { if (conn) conn.release(); } catch {}
   }
