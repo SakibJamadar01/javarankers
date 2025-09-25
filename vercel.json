@@ -1,7 +1,19 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist/spa",
+  "functions": {
+    "api/test-register.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/index.mjs": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "rewrites": [
+    {
+      "source": "/api/test-register",
+      "destination": "/api/test-register.js"
+    },
     {
       "source": "/api/(.*)",
       "destination": "/api/index.mjs"

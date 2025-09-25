@@ -5,6 +5,12 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: 'ping pong', timestamp: new Date().toISOString() });
     }
     
+    // Handle test-register specifically
+    if (req.url === '/api/test-register') {
+      const testRegisterHandler = await import('../api/test-register.js');
+      return testRegisterHandler.default(req, res);
+    }
+    
     // Try to load the server
     const { createServer } = await import('../server/index.js');
     const app = await createServer();

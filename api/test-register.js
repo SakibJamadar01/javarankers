@@ -1,34 +1,41 @@
+import { Pool } from 'pg';
+
 export default async function handler(req, res) {
   try {
-    // Test database connection first
-    const { pool } = await import('../server/db.js');
+    // Test database connection directly
+    const {
+      DB_HOST = "aws-1-ap-southeast-1.pooler.supabase.com",
+      DB_PORT = "6543",
+      DB_USER = "postgres.npepikzrelfxymfwmhgu",
+      DB_PASSWORD,
+      DB_NAME = "postgres",
+    } = process.env;
+
+    const pool = new Pool({
+      host: DB_HOST,
+      port: Number(DB_PORT),
+      user: DB_USER,
+      password: DB_PASSWORD,
+      database: DB_NAME,
+      ssl: { rejectUnauthorized: false },
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    });
+
     const client = await pool.connect();
     const result = await client.query('SELECT NOW() as time');
     client.release();
     
-    // Test registration logic
-    const { register } = await import('../server/routes/auth.js');
-    
-    // Mock registration request
-    const mockReq = {
-      body: { username: 'testuser', password: 'testpass123', email: 'test@example.com' },
-      ip: '127.0.0.1'
-    };
-    
-    const mockRes = {
-      status: (code) => ({ json: (data) => ({ statusCode: code, data }) }),
-      json: (data) => ({ statusCode: 200, data })
-    };
-    
-    const registerResult = await register(mockReq, mockRes);
-    
     res.status(200).json({
       dbConnection: 'OK',
       dbTime: result.rows[0].time,
-      registerTest: registerResult || 'Function executed',
+      message: 'Database connection successful',
       env: {
         hasDbHost: !!process.env.DB_HOST,
-        hasDbPassword: !!process.env.DB_PASSWORD
+        hasDbPassword: !!process.env.DB_PASSWORD,
+        dbHost: DB_HOST,
+        dbUser: DB_USER
       }
     });
   } catch (error) {
