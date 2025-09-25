@@ -254,6 +254,29 @@ export async function createServer() {
     res.json({ message: ping });
   });
 
+  // Debug endpoint
+  app.get("/api/debug", async (_req, res) => {
+    try {
+      const { pool } = await import('./db.js');
+      const client = await pool.connect();
+      const result = await client.query('SELECT NOW() as time');
+      client.release();
+      res.json({ 
+        status: 'Database connected', 
+        time: result.rows[0].time,
+        env: {
+          DB_HOST: process.env.DB_HOST,
+          DB_PORT: process.env.DB_PORT,
+          DB_USER: process.env.DB_USER,
+          DB_NAME: process.env.DB_NAME,
+          hasPassword: !!process.env.DB_PASSWORD
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message, stack: error.stack });
+    }
+  });
+
   app.get("/api/demo", handleDemo);
   app.post("/api/execute", handleExecute);
 
